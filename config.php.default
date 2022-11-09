@@ -1,0 +1,4 @@
+<?php
+
+const APIREST_ALMA_URLBASE = "https://api-eu.hosted.exlibrisgroup.com";
+const APIREST_ALMA_KEY = "";

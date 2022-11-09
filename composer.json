@@ -1,0 +1,30 @@
+{
+    "name": "upc-sbpa/canvi-descripcio-item",
+    "description": "Utilitat per canviar la descripció dels ítems després de la migració a ALMA",
+    "type": "library",
+    "autoload": {
+        "psr-4": {
+            "UPCSBPA\\CanviDescripcioItem\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Toni Prieto",
+            "email": "antonio.juan.prieto@upc.edu"
+        }
+    ],
+    "require": {
+        "php" : ">=7.4",
+        "guzzlehttp/guzzle": "^6.3",
+        "ext-json": "*",
+        "ext-mbstring": "*"
+    },
+    "require-dev" : {
+        "phpunit/phpunit" : "^9.0"
+    },
+    "autoload-dev" : {
+        "psr-4" : {
+            "UPCSBPA\\CanviDescripcioItem\\tests\\" : "tests/"
+        }
+    }
+}
