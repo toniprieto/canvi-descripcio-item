@@ -9,6 +9,7 @@ class AlmaClient {
 
     const ENDPOINT_SETS = "/almaws/v1/conf/sets";
     const ENDPOINT_BIBS = "/almaws/v1/bibs";
+    const ENDPOINT_ITEMS = "/almaws/v1/items";
 
     private $apiUrl = null;
     private $apiKey = null;
@@ -186,7 +187,7 @@ class AlmaClient {
      * GET /almaws/v1/items?item_barcode={item_barcode}.
      * Calling this shorthand URL will return an HTTP 302 redirect response leading to a
      * URL with the structure documented here. Please note that the redirect request will be
-     * counted as a seperate request, in regards to the daily threshold.]
+     * counted as a separate request, in regards to the daily threshold.]
      *
      * @param $mms_id
      * @param $holding_id
@@ -220,6 +221,38 @@ class AlmaClient {
 
         try {
             $response = $this->restClient->get($this::ENDPOINT_BIBS . "/" . $mms_id . "/holdings/" . $holding_id . "/items/" . $pid, [
+                'query' => $query,
+                'headers' => ['Accept' => 'application/json']
+            ]);
+        } catch (ClientException $exception) {
+            throw ALMAExceptionFactory::createHTTPThrowable($exception, "Error recuperant llistat d'items");
+        }
+
+        return json_decode($response->getBody(), false);
+    }
+
+    /**
+     * Versió funció recuperar ítems a partir del barcode, retorna una resposta HTTP 301 redirigint cap
+     * a la versió amb els 3 identificadors
+     *
+     * GET /almaws/v1/items?item_barcode={item_barcode}.
+     * Calling this shorthand URL will return an HTTP 302 redirect response leading to a
+     * URL with the structure documented here. Please note that the redirect request will be
+     * counted as a separate request, in regards to the daily threshold.]
+     *
+     * @param $barcode
+     * @return mixed
+     * @throws exceptions\ALMAHTTPException
+     */
+    public function getItemFromBarcode($barcode) {
+
+        $query = [
+            'apikey' => $this->apiKey,
+            'item_barcode' => $barcode
+        ];
+
+        try {
+            $response = $this->restClient->get($this::ENDPOINT_ITEMS, [
                 'query' => $query,
                 'headers' => ['Accept' => 'application/json']
             ]);
