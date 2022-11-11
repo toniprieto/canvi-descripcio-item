@@ -27,7 +27,7 @@ Es pot llançar amb diferents modes:
 
 - Llançar sobre un set de bibliogràfics:
 
-`php ./src/main.php -i <id_set_items>`
+`php ./src/main.php -b <id_set_bibbliografics>`
 
 - Llançar sobre un únic bibliogràfic
 
