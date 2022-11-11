@@ -20,6 +20,7 @@ class ItemDescription
     public static function convert($in) {
 
         $patronsSimpleVolum = [
+            "/^v\.? *([0-9]+)$/i",
             "/^volu?m?\.? *([0-9]+)$/i",
         ];
 
@@ -27,12 +28,13 @@ class ItemDescription
             "/^r?e?impr?\.?,? *([0-9]{4})$/i",
             "/^reimpressió +([0-9]{4})$/i",
             "/^REIMPRESSIÓ +([0-9]{4})$/i",
+            //Amb ordinals
+            "/^[0-9]{1,2}A *r?e?impr?\.? *([0-9]{4})$/i",
+            "/^[0-9]{1,2}A *REIMPRESSIÓ *([0-9]{4})$/i",
+            "/^[0-9]{1,2}A *reimpressió *([0-9]{4})$/i",
         ];
 
         $patronsOrdinal = [
-            "/^[0-9]{1,2}A *(r?e?impr?\.? *[0-9]{4})$/i",
-            "/^[0-9]{1,2}A *(REIMPRESSIÓ *[0-9]{4})$/i",
-            "/^[0-9]{1,2}A *(reimpressió *[0-9]{4})$/i",
             // Sense el any
             "/^[0-9]{1,2}A *(r?e?impr?\.?)$/i",
             "/^[0-9]{1,2}A *(REIMPRESSIÓ)$/i",

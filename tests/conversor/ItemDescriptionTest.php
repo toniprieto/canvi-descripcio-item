@@ -49,12 +49,12 @@ class ItemDescriptionTest extends TestCase
             [ ["description" => "VOL. 3, REIMP. 2003", "public_note" => "Nota"], ["description" => "3", "public_note" => "Nota | Reimpressió 2003", "found" => true]],
 
             [ ["description" => "1A IMPR.", "public_note" => "Nota"], ["description" => "IMPR.", "public_note" => "Nota", "found" => true]],
-            [ ["description" => "2A IMPR. 1960", "public_note" => ""], ["description" => "IMPR. 1960", "public_note" => "", "found" => true]],
-            [ ["description" => "1A REIMP 1981", "public_note" => ""], ["description" => "REIMP 1981", "public_note" => "", "found" => true]],
-            [ ["description" => "17A REIMPR. 1988", "public_note" => ""], ["description" => "REIMPR. 1988", "public_note" => "", "found" => true]],
-            [ ["description" => "7A Reimpressió 2021", "public_note" => ""], ["description" => "Reimpressió 2021", "public_note" => "", "found" => true]],
-            [ ["description" => "98A REIMPRESSIÓ 2022", "public_note" => ""], ["description" => "REIMPRESSIÓ 2022", "public_note" => "", "found" => true]],
-            [ ["description" => "28A reimpressió 2023", "public_note" => ""], ["description" => "reimpressió 2023", "public_note" => "", "found" => true]],
+            [ ["description" => "2A IMPR. 1960", "public_note" => ""], ["description" => "", "public_note" => "Reimpressió 1960", "found" => true]],
+            [ ["description" => "1A REIMP 1981", "public_note" => ""], ["description" => "", "public_note" => "Reimpressió 1981", "found" => true]],
+            [ ["description" => "17A REIMPR. 1988", "public_note" => ""], ["description" => "", "public_note" => "Reimpressió 1988", "found" => true]],
+            [ ["description" => "7A Reimpressió 2021", "public_note" => ""], ["description" => "", "public_note" => "Reimpressió 2021", "found" => true]],
+            [ ["description" => "98A REIMPRESSIÓ 2022", "public_note" => ""], ["description" => "", "public_note" => "Reimpressió 2022", "found" => true]],
+            [ ["description" => "28A reimpressió 2023", "public_note" => ""], ["description" => "", "public_note" => "Reimpressió 2023", "found" => true]],
 
             // Sense ordinal
             [ ["description" => "A reimpressió 1980", "public_note" => ""], ["found" => false]],

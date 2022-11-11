@@ -308,7 +308,7 @@ function esReservaAutoCancelable($request) {
     if (isset($request->task_name) && $request->task_name == "Pickup From Shelf") {
         return true;
     }
-    if (isset($request->request_status) && $request->request_status == "NOT_STARTED") {
+    if (isset($request->request_status) && ($request->request_status == "NOT_STARTED" || $request->request_status == "Not Started")) {
         return true;
     }
 
