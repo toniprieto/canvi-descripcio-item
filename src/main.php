@@ -7,6 +7,7 @@
  * php main.php -i <id_item_set>
  * php main.php -b <id_bib_set>
  * php main.php -m <mms_id>
+ * php main.php -p <barcode>
  *
  * Amb opció -a per aplicar canvis.
  */
@@ -359,7 +360,7 @@ function printHelp(){
     echo " -i,--itemset" . "\t\t"      . "Set amb els ítems a tractar\n";
     echo " -b,--bibset" . "\t\t"       . "Set amb els bibliogafics a tractar\n";
     echo " -m,--mmsid" . "\t\t"       . "Id MMS d'un bibliogràfic a tractar\n";
-    echo " -p,--physicalbarcode" . "\t\t"       . "Coid de barres del ítem a tractar\n";
+    echo " -p,--physicalbarcode" . "\t\t"       . "Codi de barres del ítem a tractar\n";
     echo " -a,--aplicacanvis" . "\t\t"    . "Aplica els canvis, si no, només crea un CSV amb les dades que processa\n";
     echo " -d,--debug" . "\t\t"      . "Imprimeix missatges de debug\n";
     echo " -h,--help" . "\t\t"      . "Imprimeix aquesta ajuda\n";
