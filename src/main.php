@@ -7,12 +7,14 @@
  * php main.php -i <id_item_set>
  * php main.php -b <id_bib_set>
  * php main.php -m <mms_id>
+ * php main.php -p <barcode>
  *
  * Amb opció -a per aplicar canvis.
  */
 
 use UPCSBPA\CanviDescripcioItem\ALMA\AlmaClient;
 use UPCSBPA\CanviDescripcioItem\ALMA\exceptions\ALMAException;
+use UPCSBPA\CanviDescripcioItem\ALMA\exceptions\ALMAHTTPException;
 use UPCSBPA\CanviDescripcioItem\conversor\ItemDescription;
 use UPCSBPA\CanviDescripcioItem\helpers\StringHelper;
 
@@ -29,7 +31,7 @@ $cacheBibs = [];
 $almaClient = new AlmaClient();
 $almaClient->configAPI(APIREST_ALMA_URLBASE, APIREST_ALMA_KEY);
 
-$opcions = getopt("i:b:m:adh", array("itemset:","bibset:","mmsid:","aplicacanvis","debug","help"));
+$opcions = getopt("i:b:m:p:adh", array("itemset:","bibset:","mmsid:","physicalbarcode","aplicacanvis","debug","help"));
 
 if (isset($opcions["h"])) {
     printHelp();
@@ -47,10 +49,11 @@ if (isset($opcions["d"])) {
 // Recuperem el set o bibId a processar
 $setId = null;
 $mmsId = null;
+$barcodeId = null;
 $mode = null;
 
-if (!isset($opcions["i"]) && !isset($opcions["b"]) && !isset($opcions["m"])) {
-    echo "Cal proporcionar un set d'ítems (-i), un set de bibliogràfics (-b) o un MmsId (-m)\n";
+if (!isset($opcions["i"]) && !isset($opcions["b"]) && !isset($opcions["m"]) && !isset($opcions["p"])) {
+    echo "Cal proporcionar un set d'ítems (-i), un set de bibliogràfics (-b) o un MmsId (-m) o un Codi de barres (-p)\n";
     exit(-1);
 } else {
     if (isset($opcions["i"])) {
@@ -61,6 +64,8 @@ if (!isset($opcions["i"]) && !isset($opcions["b"]) && !isset($opcions["m"])) {
         $mode = "bib";
     } else if (isset($opcions["m"])) {
         $mmsId = $opcions["m"];
+    } else if (isset($opcions["p"])) {
+        $barcodeId = $opcions["p"];
     }
 }
 
@@ -130,6 +135,8 @@ try {
 
     } else if (isset($mmsId)) {
         processaBibliografic($mmsId, $ferCanvis, $comprovarNivellM);
+    } else if (isset($barcodeId)) {
+        processaItemDesdeCodiBarres($barcodeId, $ferCanvis, $comprovarNivellM);
     }
 
 } catch (ALMAException $e) {
@@ -146,7 +153,7 @@ fclose($outFile);
  * @param $mmsId
  * @param $ferCanvis
  * @package $comprovarNivellM
- * @throws \UPCSBPA\CanviDescripcioItem\ALMA\exceptions\ALMAHTTPException
+ * @throws ALMAHTTPException
  */
 function processaBibliografic($mmsId, $ferCanvis, $comprovarNivellM) {
 
@@ -195,7 +202,7 @@ function processaBibliografic($mmsId, $ferCanvis, $comprovarNivellM) {
  *
  * @param $mmsId
  * @return string
- * @throws \UPCSBPA\CanviDescripcioItem\ALMA\exceptions\ALMAHTTPException
+ * @throws ALMAHTTPException
  */
 function recuperaNivellBibliografic($mmsId)
 {
@@ -225,6 +232,23 @@ function recuperaNivellBibliografic($mmsId)
     return $nivell;
 }
 
+/**
+ * Processa un item des d'un codi de barres. Recupera el item de l'API i criaa a la funció que
+ * processa les dades
+ *
+ * @param $barcode
+ * @param $ferCanvis
+ * @param $comprovarNivellM
+ * @throws ALMAHTTPException
+ */
+function processaItemDesdeCodiBarres($barcode, $ferCanvis, $comprovarNivellM) {
+
+    global $almaClient;
+
+    // Recuperem el item per codi de barres i el processem
+    $item = $almaClient->getItemFromBarcode($barcode);
+    processaItem($item->bib_data->mms_id, $item, $ferCanvis, $comprovarNivellM);
+}
 
 /**
  * Processa un registre d'item
@@ -232,7 +256,7 @@ function recuperaNivellBibliografic($mmsId)
  * @param $mmsId string mmsId d'ALMA del bibliogràfic
  * @param $item mixed amb dades del ítem recuperades de l'API
  * @param $comprovarNivellM bool
- * @throws \UPCSBPA\CanviDescripcioItem\ALMA\exceptions\ALMAHTTPException
+ * @throws ALMAHTTPException
  */
 function processaItem($mmsId, $item, $ferCanvis, $comprovarNivellM) {
 
@@ -336,7 +360,7 @@ function processaItem($mmsId, $item, $ferCanvis, $comprovarNivellM) {
  * @param $holdingId
  * @param $item
  * @return bool
- * @throws \UPCSBPA\CanviDescripcioItem\ALMA\exceptions\ALMAHTTPException
+ * @throws ALMAHTTPException
  */
 function teReservesAutoCancelables($mmsId, $holdingId, $item) {
 
@@ -364,21 +388,34 @@ function teReservesAutoCancelables($mmsId, $holdingId, $item) {
 /**
  * Retorna si la reserva s'autocancela al canviar la restricció:
  * Només mira si alguna de les reserves té Task_name = "Pickup From Shelf"
- * o request_status = "NOT_STARTED"
+ * o request_status = "Not Started"
  *
  * @param $request
  * @return bool
  */
 function esReservaAutoCancelable($request) {
 
-    if (isset($request->task_name) && $request->task_name == "Pickup From Shelf") {
+    if (isset($request->task_name) && normalitzaValor($request->task_name) == normalitzaValor("Pickup From Shelf")) {
         return true;
     }
-    if (isset($request->request_status) && ($request->request_status == "NOT_STARTED" || $request->request_status == "Not Started")) {
+    if (isset($request->request_status) && normalitzaValor($request->request_status) == normalitzaValor("Not Started")) {
         return true;
     }
 
     return false;
+}
+
+/**
+ * Passa un valor a majúscula i substitueix espais per guions baixos.
+ * Ens hem trobat que en algun cas, com el request_status = Not Started
+ * ve com NOT_STARTED
+ * Fem servir aquesta funció per estar segurs que ve amb el mateix format al comparar
+ *
+ * @param $valor string amb valor, exemple "Not Started"
+ * @return array|string|string[] nou string, exemple NOT_STARTED
+ */
+function normalitzaValor($valor) {
+    return str_replace(" ", "_",strtoupper($valor));
 }
 
 /**
@@ -391,7 +428,9 @@ function printHelp(){
     echo " -i,--itemset" . "\t\t"      . "Set amb els ítems a tractar\n";
     echo " -b,--bibset" . "\t\t"       . "Set amb els bibliogafics a tractar\n";
     echo " -m,--mmsid" . "\t\t"       . "Id MMS d'un bibliogràfic a tractar\n";
+    echo " -p,--physicalbarcode" . "\t\t"       . "Codi de barres del ítem a tractar\n";
     echo " -a,--aplicacanvis" . "\t\t"    . "Aplica els canvis, si no, només crea un CSV amb les dades que processa\n";
+    echo " -d,--debug" . "\t\t"      . "Imprimeix missatges de debug\n";
     echo " -h,--help" . "\t\t"      . "Imprimeix aquesta ajuda\n";
     echo "\n";
 }

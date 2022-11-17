@@ -27,11 +27,15 @@ Es pot llançar amb diferents modes:
 
 - Llançar sobre un set de bibliogràfics:
 
-`php ./src/main.php -i <id_set_items>`
+`php ./src/main.php -b <id_set_bibbliografics>`
 
 - Llançar sobre un únic bibliogràfic
 
 `php ./src/main.php -m <mms_id_bibliografic>`
+
+- Llançar sobre un únic ítem (amb el codi de barres)
+
+`php ./src/main.php -p <codi_barres_item>`
 
 Per defecte no aplica cap canvi i genera un CSV a la carpeta logs amb les dades que ha processat. Per aplicar els canvis cal afegir el paràmetre -a:
 

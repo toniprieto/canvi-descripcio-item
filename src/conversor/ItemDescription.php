@@ -19,6 +19,10 @@ class ItemDescription
      */
     public static function convert($in) {
 
+        $patronsDescartats = [
+            "/^1A\.? *r?e?impr?\.?$/i",
+        ];
+
         $patronsSimpleVolum = [
             "/^v\.? *([0-9]+)$/i",
             "/^volu?m?\.? *([0-9]+)$/i",
@@ -29,26 +33,31 @@ class ItemDescription
             "/^reimpressió +([0-9]{4})$/i",
             "/^REIMPRESSIÓ +([0-9]{4})$/i",
             //Amb ordinals
-            "/^[0-9]{1,2}A *r?e?impr?\.? *([0-9]{4})$/i",
-            "/^[0-9]{1,2}A *REIMPRESSIÓ *([0-9]{4})$/i",
-            "/^[0-9]{1,2}A *reimpressió *([0-9]{4})$/i",
+            "/^[0-9]{1,2}A\.? *r?e?impr?\.? *([0-9]{4})$/i",
+            "/^[0-9]{1,2}A\.? *REIMPRESSIÓ *([0-9]{4})$/i",
+            "/^[0-9]{1,2}A\.? *reimpressió *([0-9]{4})$/i",
+            // Ordinals Sense el any
+            "/^[0-9]{1,2}A\.? *r?e?impr?\.?$/i",
+            "/^[0-9]{1,2}A\.? *REIMPRESSIÓ$/i",
+            "/^[0-9]{1,2}A\.? *reimpressió$/i"
         ];
 
-        $patronsOrdinal = [
-            // Sense el any
-            "/^[0-9]{1,2}A *(r?e?impr?\.?)$/i",
-            "/^[0-9]{1,2}A *(REIMPRESSIÓ)$/i",
-            "/^[0-9]{1,2}A *(reimpressió)$/i"
-        ];
 
         $patronsDobles = [
-            "/^volu?m?\.? *([0-9]+),? *reimpr?\.? *([0-9]{4})$/i",
-            "/^volu?m?\.? *([0-9]+),? *\(?reimpr?\.? *([0-9]{4})\)?$/i",
-            "/^volu?m?\.? *([0-9]+),? *\(?impr?\.? *([0-9]{4})\)?$/i",
-            "/^volu?m?\.? *([0-9]+),? *impr?\.? *([0-9]{4})$/i",
+            "/^volu?m?\.? *([0-9]+),? *\(?r?e?impr?\.? *([0-9]{4})\)?$/i",
             "/^volu?m?\.? *([0-9]+),? *reimpressió *([0-9]{4})$/i",
             "/^volu?m?\.? *([0-9]+),? *REIMPRESSIÓ *([0-9]{4})$/i",
+            "/^v\.? *([0-9]+),? *\(?r?e?impr?\.? *([0-9]{4})\)?$/i",
+            "/^v\.? *([0-9]+),? *reimpressió *([0-9]{4})$/i",
+            "/^v\.? *([0-9]+),? *REIMPRESSIÓ *([0-9]{4})$/i",
         ];
+
+        // Processem primer patrons que no volem convertir ara per ara
+        foreach($patronsDescartats as $patron) {
+            if (preg_match($patron,trim($in["description"]), $matches)) {
+                return ["found" => false];
+            }
+        }
 
         foreach($patronsSimpleVolum as $patron) {
             if (preg_match($patron,trim($in["description"]), $matches)) {
@@ -56,15 +65,13 @@ class ItemDescription
             }
         }
 
-        foreach($patronsOrdinal as $patron) {
-            if (preg_match($patron,trim($in["description"]), $matches)) {
-                return ["description" => $matches[1], "public_note" => $in["public_note"], "found" => true];
-            }
-        }
-
         foreach($patronsSimpleReimpressio as $patron) {
             if (preg_match($patron,trim($in["description"]), $matches)) {
-                $partReimpressio = "Reimpressió " . $matches[1];
+                if (isset($matches[1])) {
+                    $partReimpressio = "Reimpressió " . $matches[1];
+                } else {
+                    $partReimpressio = "Reimpressió";
+                }
                 if ($in["public_note"] != "") {
                     $publicNote = trim($in["public_note"]) . " | " .  $partReimpressio;
                 } else {
