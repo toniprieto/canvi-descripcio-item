@@ -57,8 +57,18 @@ class ItemDescriptionTest extends TestCase
             [ ["description" => "98A REIMPRESSIÓ 2022", "public_note" => ""], ["description" => "", "public_note" => "Reimpressió 2022", "found" => true]],
             [ ["description" => "28A reimpressió 2023", "public_note" => ""], ["description" => "", "public_note" => "Reimpressió 2023", "found" => true]],
 
+            [ ["description" => "2A. IMPR.", "public_note" => "Nota"], ["description" => "", "public_note" => "Nota | Reimpressió", "found" => true]],
+            [ ["description" => "2A. IMPR. 1960", "public_note" => ""], ["description" => "", "public_note" => "Reimpressió 1960", "found" => true]],
+            [ ["description" => "4A. REIMP 1981", "public_note" => ""], ["description" => "", "public_note" => "Reimpressió 1981", "found" => true]],
+            [ ["description" => "17A. REIMPR. 1988", "public_note" => ""], ["description" => "", "public_note" => "Reimpressió 1988", "found" => true]],
+            [ ["description" => "7A. Reimpressió 2021", "public_note" => ""], ["description" => "", "public_note" => "Reimpressió 2021", "found" => true]],
+            [ ["description" => "98A. REIMPRESSIÓ 2022", "public_note" => ""], ["description" => "", "public_note" => "Reimpressió 2022", "found" => true]],
+            [ ["description" => "28A. reimpressió 2023", "public_note" => ""], ["description" => "", "public_note" => "Reimpressió 2023", "found" => true]],
+
+
             // excepció primera impressió
             [ ["description" => "1A impr.", "public_note" => ""], ["found" => false]],
+            [ ["description" => "1A. impr.", "public_note" => ""], ["found" => false]],
             // Sense ordinal
             [ ["description" => "A reimpressió 1980", "public_note" => ""], ["found" => false]],
             // Provar final diferent
