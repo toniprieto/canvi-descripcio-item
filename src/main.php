@@ -14,9 +14,16 @@
 use UPCSBPA\CanviDescripcioItem\ALMA\AlmaClient;
 use UPCSBPA\CanviDescripcioItem\ALMA\exceptions\ALMAException;
 use UPCSBPA\CanviDescripcioItem\conversor\ItemDescription;
+use UPCSBPA\CanviDescripcioItem\helpers\StringHelper;
 
 require __DIR__ . '/../vendor/autoload.php';
 include __DIR__ . "/config.php";
+
+// Comprova tipus de bibligoràfic
+// Comprovem que el nivell del bibliogràfic és igual a "m" abans de processar
+$comprovarNivellM = COMPROVAR_NIVELL_M;
+$cacheBibs = [];
+
 
 // Alma client
 $almaClient = new AlmaClient();
@@ -93,7 +100,7 @@ try {
 
                         $item = $almaClient->getItem($mmsId, $holdingId, $pid);
 
-                        processaItem($mmsId, $item, $ferCanvis);
+                        processaItem($mmsId, $item, $ferCanvis, $comprovarNivellM);
 
                     } else {
                         echo "ERROR: no s'ha pogut obtenir les dades de l'ítem: " . $member->id . "\n";
@@ -101,7 +108,7 @@ try {
 
                 } else if ($mode == "bib") {
 
-                    processaBibliografic($member->id, $ferCanvis);
+                    processaBibliografic($member->id, $ferCanvis, $comprovarNivellM);
 
                 } else {
 
@@ -122,7 +129,7 @@ try {
         }
 
     } else if (isset($mmsId)) {
-        processaBibliografic($mmsId, $ferCanvis);
+        processaBibliografic($mmsId, $ferCanvis, $comprovarNivellM);
     }
 
 } catch (ALMAException $e) {
@@ -138,11 +145,21 @@ fclose($outFile);
  *
  * @param $mmsId
  * @param $ferCanvis
+ * @package $comprovarNivellM
  * @throws \UPCSBPA\CanviDescripcioItem\ALMA\exceptions\ALMAHTTPException
  */
-function processaBibliografic($mmsId, $ferCanvis) {
+function processaBibliografic($mmsId, $ferCanvis, $comprovarNivellM) {
 
     global $almaClient;
+
+    if ($comprovarNivellM) {
+        $nivell = recuperaNivellBibliografic($mmsId);
+        // Si el nivell bibliogràfic és diferent de "m" no processem
+        if ($nivell != "m") {
+            echo "Registre $mmsId descartat per valor nivell de bibliogràfic: \"$nivell\" \n";
+            return;
+        }
+    }
 
     $limit = 100;
     $offset = 0;
@@ -155,7 +172,8 @@ function processaBibliografic($mmsId, $ferCanvis) {
         while ($continua) {
 
             foreach ($items->item as $item) {
-                processaItem($mmsId, $item, $ferCanvis);
+                // Ja hem comprovat el nivell del bibliogràfic, demanem no tornar-ho a fer
+                processaItem($mmsId, $item, $ferCanvis, false);
             }
 
             // Actualitzem offset
@@ -171,17 +189,63 @@ function processaBibliografic($mmsId, $ferCanvis) {
     }
 }
 
+/**
+ * Donat un mmsid recupera el bibliogràfic i retorna la posició 07 del leader
+ * que marca el nivell de bibliogràfic
+ *
+ * @param $mmsId
+ * @return string
+ * @throws \UPCSBPA\CanviDescripcioItem\ALMA\exceptions\ALMAHTTPException
+ */
+function recuperaNivellBibliografic($mmsId)
+{
+    global $almaClient, $cacheBibs;
+
+    // Mirem si ja el tenim a cache
+    if (isset($cacheBibs[$mmsId])) {
+        return $cacheBibs[$mmsId];
+    }
+
+    $dataBib = $almaClient->getBib($mmsId, "full");
+
+    // Biblipgràfic en format MarcXML
+    $strMarcxml = $dataBib->anies[0];
+    $leader = StringHelper::substr_before(StringHelper::substr_after($strMarcxml, "<leader>"), "</leader>");
+
+    //Guardem la resposta a cache i la limitem
+    if (sizeof($cacheBibs) > 100) {
+        reset($cacheBibs);
+        $key = key($cacheBibs);
+        unset($cacheBibs[$key]);
+    }
+    $nivell = substr($leader, 7, 1);
+    $cacheBibs[$mmsId] =  $nivell;
+
+    // Retornem posició 7 del leader
+    return $nivell;
+}
+
 
 /**
  * Processa un registre d'item
  *
  * @param $mmsId string mmsId d'ALMA del bibliogràfic
  * @param $item mixed amb dades del ítem recuperades de l'API
+ * @param $comprovarNivellM bool
  * @throws \UPCSBPA\CanviDescripcioItem\ALMA\exceptions\ALMAHTTPException
  */
-function processaItem($mmsId, $item, $ferCanvis) {
+function processaItem($mmsId, $item, $ferCanvis, $comprovarNivellM) {
 
     global $almaClient, $debug, $outFile;
+
+    if ($comprovarNivellM) {
+        $nivell = recuperaNivellBibliografic($mmsId);
+        // Si el nivell bibliogràfic és diferent de "m" no processem
+        if ($nivell != "m") {
+            echo "Item " .  $item->item_data->barcode . " descartat per valor nivell de bibliogràfic: \"$nivell\" \n";
+            return;
+        }
+    }
 
     $calModificarRegistre = false;
     $modificat = false;
@@ -189,7 +253,9 @@ function processaItem($mmsId, $item, $ferCanvis) {
     $barcode = $item->item_data->barcode;
 
     echo "Processant " . $barcode . " :\n";
-    //print_r($item);
+    if ($debug) {
+        //print_r($item);
+    }
 
     // Preparem els camps per fer la conversió
     $in = [

@@ -2,3 +2,7 @@
 
 const APIREST_ALMA_URLBASE = "https://api-eu.hosted.exlibrisgroup.com";
 const APIREST_ALMA_KEY = "";
+
+// Comprovem que el nivell del bibliogràfic és igual a "m" abans de processar
+// Posar a false si llancem contra un set amb els bibliogràfics ja filtrats i volem accelerar el procés
+const COMPROVAR_NIVELL_M = true;

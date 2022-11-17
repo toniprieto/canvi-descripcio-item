@@ -64,4 +64,12 @@ class StringHelper
         }
     }
 
+    static function substr_after($haystack, $needle) {
+        return substr($haystack, strpos($haystack, $needle) + strlen($needle));
+    }
+
+    static function substr_before($haystack, $needle) {
+        return substr($haystack, 0, strpos($haystack, $needle));
+    }
+
 }
