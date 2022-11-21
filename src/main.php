@@ -276,7 +276,7 @@ function processaItem($mmsId, $item, $ferCanvis, $comprovarNivellM) {
     $holdingId = $item->holding_data->holding_id;
     $barcode = $item->item_data->barcode;
 
-    echo "Processant " . $barcode . " :\n";
+    echo "Processant " . $barcode . ": " . $item->item_data->description. "\n";
     if ($debug) {
         //print_r($item);
     }
