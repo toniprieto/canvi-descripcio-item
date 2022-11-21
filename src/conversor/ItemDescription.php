@@ -61,25 +61,28 @@ class ItemDescription
         $patronsGeneralsReimpressio = [
             "/^(.*)[[:punct:]] *(?:\(?r?e?impr?\.?,?|reimpressió|REIMPRESSIÓ) *([0-9]{4}|[0-9]{4}-[0-9]{4})\)?$/i",
             "/^(.*) +(?:\(?r?e?impr?\.?,?|reimpressió|REIMPRESSIÓ) *([0-9]{4}|[0-9]{4}-[0-9]{4})\)?$/i",
-            // Reimpresio al final Sense any
+            // Reimpressió al final Sense any
             "/^(.*)[[:punct:]] *(?:\(?r?e?impr?\.?,?|reimpressió|REIMPRESSIÓ)$/i",
             "/^(.*) +(?:r?e?impr?\.?,?|reimpressió|REIMPRESSIÓ)$/i",
         ];
 
         $patronsGeneralsReimpressioInvers = [
-            // Reimpressio al inici
+            // Reimpressió a l'inici
             "/^(?:\(?r?e?impr?\.?,?|reimpressió|REIMPRESSIÓ) *([0-9]{4}|[0-9]{4}-[0-9]{4})\)? ?[[:punct:]] *(.*)$/i",
             "/^(?:\(?r?e?impr?\.?,?|reimpressió|REIMPRESSIÓ) *([0-9]{4}|[0-9]{4}-[0-9]{4})\)? +(.*)$/i",
-            // Reimpressio al inici sense any
-            "/^(?:\(?r?e?impr?\.?,?|reimpressió|REIMPRESSIÓ)[[:punct:]] *(.*)$/i",
-            "/^(?:r?e?impr?\.?,?|reimpressió|REIMPRESSIÓ) +(.*)$/i",
+            // Reimpressió a l'inici sense any
+            // Comentat, millor no fer aquests casos, pot generar resultats erronis en algun cas
+            //"/^(?:\(?r?e?impr?\.?,?|reimpressió|REIMPRESSIÓ)[[:punct:]] *(.*)$/i",
+            //"/^(?:r?e?impr?\.?,?|reimpressió|REIMPRESSIÓ) +(.*)$/i",
         ];
 
 
         // Processem primer patrons que no volem convertir ara per ara
         foreach($patronsDescartats as $patron) {
             if (preg_match($patron,trim($in["description"]), $matches)) {
-                return ["found" => false];
+                $out = $in;
+                $out["found"] = false;
+                return $out;
             }
         }
 

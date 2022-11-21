@@ -83,7 +83,6 @@ class ItemDescriptionTest extends TestCase
             [ ["description" => "REIMPR. 2008 - CD-ROM 1", "public_note" => ""], ["description" => "CD-ROM 1", "public_note" => "Reimpressió 2008", "found" => true]],
             [ ["description" => "REIMPR. 1986, ANNEX", "public_note" => ""], ["description" => "ANNEX", "public_note" => "Reimpressió 1986", "found" => true]],
             [ ["description" => "REIMPR.2006 APÈNDIX", "public_note" => ""], ["description" => "APÈNDIX", "public_note" => "Reimpressió 2006", "found" => true]],
-            [ ["description" => "REIMPR., CD", "public_note" => ""], ["description" => "CD", "public_note" => "Reimpressió", "found" => true]],
             [ ["description" => "REIMPR. 2001 CD-ROM 4 ", "public_note" => ""], ["description" => "CD-ROM 4", "public_note" => "Reimpressió 2001", "found" => true]],
             [ ["description" => "REIMP. 2001.MANUAL", "public_note" => ""], ["description" => "MANUAL", "public_note" => "Reimpressió 2001", "found" => true]],
             [ ["description" => "REIMP.1986 V.1 T.2 ", "public_note" => ""], ["description" => "V.1 T.2", "public_note" => "Reimpressió 1986", "found" => true]],
