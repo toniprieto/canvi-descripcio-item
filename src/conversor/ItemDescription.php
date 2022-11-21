@@ -20,37 +20,61 @@ class ItemDescription
     public static function convert($in) {
 
         $patronsDescartats = [
-            "/^1A\.? *r?e?impr?\.?$/i",
+            "/^1A\.? *r?e?impr?\.?,?$/i",
+            "/^(.*) 1A\.? *\(?r?e?impr?\.?,? *([0-9]{4}|[0-9]{4}-[0-9]{4})\)?$/i",
+            "/^(?:v|volu?m?)\.? *([0-9]+),? 1A\.? *(?:\(?r?e?impr?\.?,?|reimpressió|REIMPRESSIÓ) *([0-9]{4}|[0-9]{4}-[0-9]{4})\)?$/i",
         ];
 
         $patronsSimpleVolum = [
-            "/^v\.? *([0-9]+)$/i",
-            "/^volu?m?\.? *([0-9]+)$/i",
+            "/^(?:v|volu?m?)\.? *([0-9]+)$/i",
         ];
 
         $patronsSimpleReimpressio = [
-            "/^r?e?impr?\.?,? *([0-9]{4})$/i",
-            "/^reimpressió +([0-9]{4})$/i",
-            "/^REIMPRESSIÓ +([0-9]{4})$/i",
+            "/^(?:r?e?impr?\.?,?|reimpressió|REIMPRESSIÓ) *([0-9]{4}|[0-9]{4}-[0-9]{4})$/i",
             //Amb ordinals
-            "/^[0-9]{1,2}A\.? *r?e?impr?\.? *([0-9]{4})$/i",
-            "/^[0-9]{1,2}A\.? *REIMPRESSIÓ *([0-9]{4})$/i",
-            "/^[0-9]{1,2}A\.? *reimpressió *([0-9]{4})$/i",
+            "/^[0-9]{1,2}A\.? (?:r?e?impr?\.?,?|reimpressió|REIMPRESSIÓ) *([0-9]{4}|[0-9]{4}-[0-9]{4})$/i",
             // Ordinals Sense el any
-            "/^[0-9]{1,2}A\.? *r?e?impr?\.?$/i",
-            "/^[0-9]{1,2}A\.? *REIMPRESSIÓ$/i",
-            "/^[0-9]{1,2}A\.? *reimpressió$/i"
+            "/^[0-9]{1,2}A\.? (?:r?e?impr?\.?,?|reimpressió|REIMPRESSIÓ)$/i",
         ];
-
 
         $patronsDobles = [
-            "/^volu?m?\.? *([0-9]+),? *\(?r?e?impr?\.? *([0-9]{4})\)?$/i",
-            "/^volu?m?\.? *([0-9]+),? *reimpressió *([0-9]{4})$/i",
-            "/^volu?m?\.? *([0-9]+),? *REIMPRESSIÓ *([0-9]{4})$/i",
-            "/^v\.? *([0-9]+),? *\(?r?e?impr?\.? *([0-9]{4})\)?$/i",
-            "/^v\.? *([0-9]+),? *reimpressió *([0-9]{4})$/i",
-            "/^v\.? *([0-9]+),? *REIMPRESSIÓ *([0-9]{4})$/i",
+            // No ordinals
+            "/^(?:v|volu?m?)\.? *([0-9]+)[[:punct:]]? *(?:\(?r?e?impr?\.?,?|reimpressió|REIMPRESSIÓ) *([0-9]{4}|[0-9]{4}-[0-9]{4})\)?$/i",
+            //Amb ordinals
+            "/^(?:v|volu?m?)\.? *([0-9]+)[[:punct:]]? [0-9]{1,2}A\.? *(?:\(?r?e?impr?\.?,?|reimpressió|REIMPRESSIÓ) *([0-9]{4}|[0-9]{4}-[0-9]{4})\)?$/i",
+            // No ordinals sense any
+            "/^(?:v|volu?m?)\.? *([0-9]+)[[:punct:]]? *(?:\(?r?e?impr?\.?,?|reimpressió|REIMPRESSIÓ)\)?$/i",
+            //Amb ordinals sense any
+            "/^(?:v|volu?m?)\.? *([0-9]+)[[:punct:]]? [0-9]{1,2}A\.? *(?:\(?r?e?impr?\.?,?|reimpressió|REIMPRESSIÓ)\)?$/i",
         ];
+
+        $patronsDoblesInvers = [
+            "/^(?:\(?r?e?impr?\.?,?|reimpressió|REIMPRESSIÓ) *([0-9]{4}|[0-9]{4}-[0-9]{4})\)?[[:punct:]]? *(?:v|volu?m?)\.? *([0-9]+)$/i",
+            //Amb ordinals
+            "/^[0-9]{1,2}A\.? *(?:\(?r?e?impr?\.?,?|reimpressió|REIMPRESSIÓ) *([0-9]{4}|[0-9]{4}-[0-9]{4})\)?[[:punct:]]? (?:v|volu?m?)\.? *([0-9]+)$/i",
+            // No ordinals sense any
+            "/^(?:\(?r?e?impr?\.?,?|reimpressió|REIMPRESSIÓ)\)?[[:punct:]]? * (?:v|volu?m?)\.? *([0-9]+)$/i",
+            //Amb ordinals sense any
+            "/^[0-9]{1,2}A\.? *(?:\(?r?e?impr?\.?,?|reimpressió|REIMPRESSIÓ)\)?[[:punct:]]? (?:v|volu?m?)\.? *([0-9]+)$/i",
+        ];
+
+        $patronsGeneralsReimpressio = [
+            "/^(.*)[[:punct:]] *(?:\(?r?e?impr?\.?,?|reimpressió|REIMPRESSIÓ) *([0-9]{4}|[0-9]{4}-[0-9]{4})\)?$/i",
+            "/^(.*) +(?:\(?r?e?impr?\.?,?|reimpressió|REIMPRESSIÓ) *([0-9]{4}|[0-9]{4}-[0-9]{4})\)?$/i",
+            // Reimpresio al final Sense any
+            "/^(.*)[[:punct:]] *(?:\(?r?e?impr?\.?,?|reimpressió|REIMPRESSIÓ)$/i",
+            "/^(.*) +(?:r?e?impr?\.?,?|reimpressió|REIMPRESSIÓ)$/i",
+        ];
+
+        $patronsGeneralsReimpressioInvers = [
+            // Reimpressio al inici
+            "/^(?:\(?r?e?impr?\.?,?|reimpressió|REIMPRESSIÓ) *([0-9]{4}|[0-9]{4}-[0-9]{4})\)? ?[[:punct:]] *(.*)$/i",
+            "/^(?:\(?r?e?impr?\.?,?|reimpressió|REIMPRESSIÓ) *([0-9]{4}|[0-9]{4}-[0-9]{4})\)? +(.*)$/i",
+            // Reimpressio al inici sense any
+            "/^(?:\(?r?e?impr?\.?,?|reimpressió|REIMPRESSIÓ)[[:punct:]] *(.*)$/i",
+            "/^(?:r?e?impr?\.?,?|reimpressió|REIMPRESSIÓ) +(.*)$/i",
+        ];
+
 
         // Processem primer patrons que no volem convertir ara per ara
         foreach($patronsDescartats as $patron) {
@@ -83,7 +107,11 @@ class ItemDescription
 
         foreach($patronsDobles as $patron) {
             if (preg_match($patron,trim($in["description"]), $matches)) {
-                $partReimpressio = "Reimpressió " . $matches[2];
+                if (isset($matches[2])) {
+                    $partReimpressio = "Reimpressió " . $matches[2];
+                } else {
+                    $partReimpressio = "Reimpressió";
+                }
                 if ($in["public_note"] != "") {
                     $publicNote = trim($in["public_note"]) . " | " .  $partReimpressio;
                 } else {
@@ -91,6 +119,61 @@ class ItemDescription
                 }
 
                 return ["description" => $matches[1], "public_note" => $publicNote, "found" => true];
+            }
+        }
+
+        foreach($patronsDoblesInvers as $patron) {
+            if (preg_match($patron,trim($in["description"]), $matches)) {
+                if (isset($matches[2])) {
+                    $partReimpressio = "Reimpressió " . $matches[1];
+                    $novaDescripcio = $matches[2];
+                } else {
+                    $partReimpressio = "Reimpressió";
+                    $novaDescripcio =  $matches[1];
+                }
+                if ($in["public_note"] != "") {
+                    $publicNote = trim($in["public_note"]) . " | " .  $partReimpressio;
+                } else {
+                    $publicNote = $partReimpressio;
+                }
+
+                return ["description" => $novaDescripcio, "public_note" => $publicNote, "found" => true];
+            }
+        }
+
+        foreach($patronsGeneralsReimpressio as $patron) {
+            if (preg_match($patron,trim($in["description"]), $matches)) {
+                if (isset($matches[2])) {
+                    $partReimpressio = "Reimpressió " .$matches[2];
+                } else {
+                    $partReimpressio = "Reimpressió";
+                }
+                if ($in["public_note"] != "") {
+                    $publicNote = trim($in["public_note"]) . " | " .  $partReimpressio;
+                } else {
+                    $publicNote = $partReimpressio;
+                }
+
+                return ["description" => $matches[1], "public_note" => $publicNote, "found" => true];
+            }
+        }
+
+        foreach($patronsGeneralsReimpressioInvers as $patron) {
+            if (preg_match($patron,trim($in["description"]), $matches)) {
+                if (isset($matches[2])) {
+                    $partReimpressio = "Reimpressió " . $matches[1];
+                    $novaDescripcio = $matches[2];
+                } else {
+                    $partReimpressio = "Reimpressió";
+                    $novaDescripcio =  $matches[1];
+                }
+                if ($in["public_note"] != "") {
+                    $publicNote = trim($in["public_note"]) . " | " .  $partReimpressio;
+                } else {
+                    $publicNote = $partReimpressio;
+                }
+
+                return ["description" => $novaDescripcio, "public_note" => $publicNote, "found" => true];
             }
         }
 
