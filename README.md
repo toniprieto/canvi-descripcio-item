@@ -1,6 +1,6 @@
 # Canvi descripcions ítems ALMA
 
-Codi per fer canvis dels camps de descripció d'ítems a ALMA. Processa les descripcions i si compleixen certs patrons definits a `src/conversor/ItemDescription.php` la modifica i mou contingut a la nota pública.
+Codi per fer canvis dels camps de descripció d'ítems a ALMA. Processa les descripcions i si compleixen certs patrons definits a `src/conversor/ItemDescription.php` la modifica i mou si cal contingut a la nota pública.
 
 ## Instal·lar
 
@@ -10,7 +10,7 @@ Per instal·lar les dependències feu:
 
 ## Configurar
 
-Copia l'arxiu `src/config.php.default` a `src/config.php` i inclou la API Key per l'API d'ALMA.
+Copiar l'arxiu `src/config.php.default` a `src/config.php` i inclou la API Key per l'API d'ALMA.
 
 Cal permisos per:
 
@@ -27,7 +27,7 @@ Es pot llançar amb diferents modes:
 
 - Llançar sobre un set de bibliogràfics:
 
-`php ./src/main.php -b <id_set_bibbliografics>`
+`php ./src/main.php -b <id_set_bibliografics>`
 
 - Llançar sobre un únic bibliogràfic
 
