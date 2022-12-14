@@ -43,7 +43,7 @@ Per defecte no aplica cap canvi i genera un CSV a la carpeta logs amb les dades 
 
 ## Proves (incloure nous patrons)
 
-Conté un joc de proves per provar els patrons que es fan servir per detectar i canviar les descripcions modificables. Es poden incloude nous patrons a:
+Conté un joc de proves per provar els patrons que es fan servir per detectar i canviar les descripcions modificables. Es poden incloure nous patrons a:
 
 `src/conversor/ItemDescription.php`
 
